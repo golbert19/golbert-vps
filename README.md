@@ -1,4 +1,4 @@
-cat > README.md << 'README'
+![GOLBERT V4.3 LTS](https://raw.githubusercontent.com/golbert19/golbert-vps/main/golbert-banner.png)
 # 🛰️ GOLBERT VPS V4.3 LTS FULL REAL
 
 > Panel SSH + XRAY (VMESS/VLESS/TROJAN/SS) + OVPN + Telegram Notify
