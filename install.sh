@@ -1,11 +1,11 @@
 #!/bin/bash
-# GOLBERT VPS MEIN v4.3.2 - 101 OK - FIX DEFINITIVO
+# GOLBERT VPS MAIN v4.3.2 - 101 OK - FIX DEFINITIVO
 # FIX: 400 missing Sec-WebSocket-Key + websockets lib eliminada (RAW Proxy)
 
 if [ "$(id -u)" != "0" ]; then echo "Ejecuta como root"; exit 1; fi
 export DEBIAN_FRONTEND=noninteractive
 
-echo "=== GOLBERT MEIN v4.3.2 101 OK - Instalando ==="
+echo "=== GOLBERT MAIN v4.3.2 101 OK - Instalando ==="
 
 apt-get update -y
 apt-get install -y python3 python3-pip haproxy openssh-server dropbear stunnel4 screen curl wget socat
