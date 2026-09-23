@@ -1,4 +1,33 @@
 #!/bin/bash
+#!/bin/bash
+# GOLBERT VPS - Sistema de Licencias de 1 solo uso
+MI_IP=$(curl -s https://api.ipify.org || wget -qO- https://api.ipify.org)
+SERVIDOR="http://23.134.76.218:5000"
+
+# Si el cliente ya viene con KEY=XXXX en el comando, la usa. Si no, la pide.
+if [[ -z "$KEY" ]]; then
+  echo -e "\e[1;31m\e[1m GOLBERT VPS PERU - LICENCIA REQUERIDA\e[0m"
+  echo -n "Ingrese su KEY: "
+  read KEY
+fi
+
+echo "Validando KEY $KEY para IP $MI_IP..."
+VALID=$(curl -s --connect-timeout 10 "$SERVIDOR/validate?key=$KEY&ip=$MI_IP")
+
+if [ "$VALID" != "OK" ]; then
+  if [[ $VALID == USADA:* ]]; then
+    echo -e "\e[91m❌ Esta KEY ya fue usada en IP ${VALID#USADA:}\e[0m"
+    echo "Contacta a @golbertperuvps para nueva licencia"
+  else
+    echo -e "\e[91m❌ KEY INVALIDA. Compra en @golbertperuvps\e[0m"
+  fi
+  exit 1
+fi
+
+echo -e "\e[92m✅ KEY Valida (1 solo uso) - Instalando Golbert VPS...\e[0m"
+sleep 2
+
+# --- A PARTIR DE AQUI TU INSTALACION NORMAL ---
 # GOLBERT VPS PRO v2 - LICENCIA TELEGRAM - FULL
 if [ "$(id -u)"!= "0" ]; then echo "Ejecuta como root"; exit 1; fi
 export DEBIAN_FRONTEND=noninteractive
