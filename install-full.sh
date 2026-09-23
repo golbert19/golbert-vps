@@ -18,7 +18,7 @@ echo "$IP | $LICENSE | $(date)" > /etc/golbert/info.txt
 
 # --- AVISO A TU TELEGRAM ---
 MSG="🔑 NUEVA INSTALACION GOLBERT%0A%0A🌐 IP: $IP%0A🔑 KEY: $LICENSE%0A📅 Fecha: $(date)%0A%0AAgrega este KEY a keys.txt para autorizar"
-curl -s "https://api.telegram.org/bot$BOT_TOKEN/sendMessage?chat_id=$CHAT_ID&text=$MSG" > /dev/null 2>&1
+curl -s -X POST https://api.telegram.org/bot$BOT_TOKEN/sendMessage -d chat_id=$CHAT_ID -d text="$MSG" > /dev/null 2>&1
 
 # --- INSTALACION PUERTOS ---
 apt update -y
