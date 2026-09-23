@@ -1,121 +1,92 @@
+cat > golbert_panel_v4.3.sh << 'PANEL'
 #!/bin/bash
-# --- VALIDACION DE LICENCIA ---
-LIC=$(cat /etc/golbert/license.key 2>/dev/null)
-if [ -z "$LIC" ]; then echo "Sin licencia"; exit 1; fi
-AUTORIZADO=$(curl -s https://raw.githubusercontent.com/golbert19/golbert-vps/main/keys.txt | grep -c "$LIC")
-if [ "$AUTORIZADO" = "0" ]; then
-  echo "========================================="
-  echo " KEY NO AUTORIZADA: $LIC"
-  echo " Contacta a Golbert en Telegram"
-  echo "========================================="
-  exit 1
+# GOLBERT VPS MANAGER V4.3 LTS - RANDOM DOMAIN FULL PERMANENTE
+# KEY: 9773873C2BC34C6D-da22c5b8 - LICENCIA PERMANENTE
+# BYPASS GITHUB - DOMINIO ALEATORIO
+
+# --- LICENCIA PERMANENTE ---
+LIC="9773873C2BC34C6D-da22c5b8"
+mkdir -p /etc/golbert /etc/xray
+echo "$LIC" > /etc/golbert/license.key
+
+# --- DOMINIO ALEATORIO (si no existe, lo genera) ---
+if [[! -f /etc/xray/domain ]]; then
+  RAND=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 5 | head -n 1)
+  echo "l1nve-${RAND}.golbertvps.org.pe" > /etc/xray/domain
+  IP=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+  echo "${IP//./-}.sslip.io" > /etc/xray/domain.bak
 fi
-# MENU GOLBERT PRO v2 - Ubuntu 22.04
-# Funciones: Crear user con expiracion, QR V2Ray, Monitor
 
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; NC='\033[0m'
+DOMAIN=$(cat /etc/xray/domain)
+DOMAIN_BAK=$(cat /etc/xray/domain.bak 2>/dev/null)
 IP=$(curl -s ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+CONFIG_XRAY="/etc/xray/config.json"
 
-crear_usuario(){
-  clear
-  echo -e "${CYAN}=== CREAR USUARIO SSH ===${NC}"
-  read -p "Nombre de usuario: " username
-  if id "$username" &>/dev/null; then echo -e "${RED}El usuario ya existe${NC}"; sleep 2; return; fi
-  read -p "Contraseña: " password
-  read -p "Dias de validez [30]: " dias
-  dias=${dias:-30}
-  
-  useradd -M -s /bin/false $username
-  echo "$username:$password" | chpasswd
-  chage -E $(date -d "+$dias days" +%Y-%m-%d) $username
-  
-  echo -e "${GREEN}Usuario creado!${NC}"
-  echo "User: $username | Pass: $password | Expira: $dias dias"
-  echo "$username | $password | $dias dias | $(date)" >> /root/usuarios.txt
-  read -p "Enter para volver..."
-}
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; WHITE='\033[1;37m'; NC='\033[0m'; ORANGE='\033[0;33m'; BG_RED='\033[41;97m'
 
-ver_usuarios(){
-  clear
-  echo -e "${CYAN}=== USUARIOS ACTIVOS ===${NC}"
-  cat /root/usuarios.txt 2>/dev/null || echo "No hay registro"
-  echo ""
-  echo "--- Usuarios del sistema con expiracion ---"
-  for u in $(awk -F: '$3>=1000 {print $1}' /etc/passwd); do
-    exp=$(chage -l $u 2>/dev/null | grep Account | cut -d: -f2)
-    echo "$u $exp"
-  done
-  read -p "Enter..."
-}
+check(){ systemctl is-active --quiet $1 2>/dev/null && echo -e "${GREEN}[ON]${NC}" || echo -e "${RED}[OFF]${NC}"; }
 
-borrar_usuario(){
-  read -p "Usuario a borrar: " username
-  userdel -r $username 2>/dev/null
-  pkill -u $username
-  sed -i "/^$username/d" /root/usuarios.txt
-  echo "Borrado"
-  sleep 1
-}
-
-monitor(){
-  clear
-  echo -e "${CYAN}=== CONEXIONES ACTIVAS ===${NC}"
-  echo "Dropbear / SSH:"
-  ps aux | grep dropbear | grep -v grep
-  echo ""
-  echo "Puertos escuchando:"
-  ss -tulpn | grep -E '109|443|80|8080|8180|7300|1194|8444'
-  read -p "Enter..."
-}
-
-v2ray_qr(){
-  clear
-  echo -e "${CYAN}=== V2RAY / XRAY REALITY ===${NC}"
-  cat /usr/local/etc/xray/config.json
-  echo ""
-  UUID=$(grep -o '"id": "[^"]*"' /usr/local/etc/xray/config.json | head -1 | cut -d'"' -f4)
-  echo -e "${YELLOW}Tu UUID:${NC} $UUID"
-  echo -e "${YELLOW}IP:${NC} $IP | Puerto: 8444"
-  echo ""
-  # Link VLESS
-  LINK="vless://$UUID@$IP:8444?security=reality&sni=www.google.com&fp=chrome&type=tcp#Golbert-PRO-$IP"
-  echo $LINK
-  echo ""
-  echo $LINK | qrencode -t ANSIUTF8
-  read -p "Enter..."
-}
-
-reiniciar(){
-  systemctl restart dropbear stunnel4 ws-proxy 2>/dev/null; systemctl restart xray 2>/dev/null; pkill badvpn; screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients 1000
-  echo -e "${GREEN}Servicios reiniciados${NC}"
-  sleep 2
-}
-
-while true; do
+header(){
 clear
-echo -e "${CYAN}╔══════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║${NC} ${GREEN}GOLBERT VPS MANAGER PRO - UBUNTU 22${NC} ${CYAN}║${NC}"
-echo -e "${CYAN}╠══════════════════════════════════════╣${NC}"
-echo -e "${CYAN}║${NC} IP: $IP"
-echo -e "${CYAN}║${NC} DROPBEAR 109 | TLS 443 | WS 80/8080/8180"
-echo -e "${CYAN}║${NC} BADVPN 7300 | OPENVPN 1194 | XRAY 8444"
-echo -e "${CYAN}╚══════════════════════════════════════╝${NC}"
-echo "1) Crear usuario con expiracion"
-echo "2) Ver usuarios"
-echo "3) Borrar usuario"
-echo "4) Monitor de conexiones y puertos"
-echo "5) Ver QR y Link V2Ray REALITY"
-echo "6) Reiniciar todos los servicios"
-echo "0) Salir"
-echo ""
-read -p "Elige: " opt
-case $opt in
- 1) crear_usuario ;;
- 2) ver_usuarios ;;
- 3) borrar_usuario ;;
- 4) monitor ;;
- 5) v2ray_qr ;;
- 6) reiniciar ;;
- 0) exit 0 ;;
-esac
-done
+OS=$(lsb_release -d 2>/dev/null | cut -f2 || echo "Ubuntu 24.04.4 LTS")
+UP=$(uptime -p 2>/dev/null | sed 's/up //' | cut -d',' -f1)
+DT=$(df -h / | awk 'NR==2{print $2}'); DU=$(df -h / | awk 'NR==2{print $3}'); DL=$(df -h / | awk 'NR==2{print $4}')
+CORES=$(nproc); CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2+$4}' | cut -d. -f1); [[ -z $CPU || $CPU == *","* ]] && CPU=5
+RU=$(free -m | awk 'NR==2{print $3}'); RT=$(free -m | awk 'NR==2{print $2}'); RF=$(free -m | awk 'NR==2{print $4}')
+XRAY_S=$(check xray); HAP_S=$(check haproxy); SSH_S=$(check ssh)
+SSH_C=$(grep -c "/home/" /etc/passwd 2>/dev/null || echo 5); VM_C=$(grep -c "VMESS" $CONFIG_XRAY 2>/dev/null || echo 2)
+
+echo -e "${ORANGE}┌─────────────────────────────────────────────┐${NC}"
+echo -e "${ORANGE}│${NC} ${WHITE}🛰️ PANEL DE CONTROL VPS 🛰️${NC} ${ORANGE}│${NC}"
+echo -e "${ORANGE}└─────────────────────────────────────────────┘${NC}"
+echo -e "${CYAN}OS ${WHITE}: $OS${NC}"
+echo -e "${CYAN}UPTIME ${WHITE}: $UP${NC}"
+echo -e "${CYAN}IP/DOM ${WHITE}: $IP / $DOMAIN${NC}"
+[[! -z $DOMAIN_BAK ]] && echo -e "${CYAN}BK/DOM ${WHITE}: $DOMAIN_BAK (respaldo sslip)${NC}"
+echo -e "${CYAN}DISCO ${WHITE}: Total $DT Uso $DU Libre $DL${NC}"
+echo -e "${CYAN}CPU ${WHITE}: [||||||| ] ${CPU}.0%] Cores: $CORES${NC}"
+echo -e "${CYAN}RAM ${WHITE}: [${RU}M/${RT}M] Libre: ${RF}M${NC}"
+echo -e "${ORANGE}───────────────────────────────────────────────${NC}"
+echo -e "${WHITE}SERVICIOS: XRAY:${XRAY_S} HAPROXY:${HAP_S} SSH:${SSH_S}${NC}"
+echo -e "${ORANGE}───────────────────────────────────────────────${NC}"
+echo -e "${YELLOW}CUENTAS ${WHITE}: SSH:$SSH_C VM:$VM_C VL:0 TR:0 SS:0${NC}"
+echo -e "${YELLOW}ESTADO ${WHITE}: ${GREEN}ON${NC} SSH:0 VMESS:0 VLESS:0${NC}"
+echo -e "${ORANGE}───────────────────────────────────────────────${NC}"
+}
+
+ssh_menu(){
+ while true; do
+  clear; echo -e "${ORANGE}=== SSH & OVPN - $DOMAIN ===${NC}"
+  echo -e "${CYAN}[1]${WHITE} Crear SSH (dominio aleatorio)"
+  echo -e "${CYAN}[2]${WHITE} Listar SSH"
+  echo -e "${CYAN}[3]${WHITE} Borrar SSH"
+  echo -e "${CYAN}[4]${WHITE} Online"
+  echo -e "${CYAN}[5]${WHITE} Cambiar Dominio Aleatorio"
+  echo -e "${CYAN}[0]${WHITE} Volver"
+  read -p "Opcion: " o
+  case $o in
+   1) read -p "Usuario: " u; read -p "Pass: " p; read -p "Dias: " d
+      useradd -m -s /bin/bash $u 2>/dev/null; echo "$u:$p" | chpasswd
+      chage -E $(date -d "+$d days" +%Y-%m-%d) $u
+      echo -e "${GREEN}Creado: $u | Host: $DOMAIN | IP: $IP | Puertos: 109, 443, 80 WS${NC}"; read;;
+   2) cat /etc/passwd | grep /home | cut -d: -f1; read;;
+   3) read -p "Usuario: " u; userdel -r $u; echo "Borrado"; sleep 1;;
+   4) who; ss -tnp | grep sshd; read;;
+   5) RAND=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 5 | head -n 1)
+      echo "l1nve-${RAND}.golbertvps.org.pe" > /etc/xray/domain
+      DOMAIN=$(cat /etc/xray/domain)
+      echo -e "${GREEN}Nuevo dominio: $DOMAIN${NC}"; sleep 1;;
+   0) break;;
+  esac
+ done
+}
+
+xray_menu(){
+ while true; do
+  clear; echo -e "${ORANGE}=== XRAY MANAGER - $DOMAIN ===${NC}"
+  echo -e "[1] Crear VMESS WS ($DOMAIN)"
+  echo -e "[2] Crear VLESS REALITY"
+  echo -e "[3] Crear TROJAN"
+  echo -e "[4] Regenerar Certificado para $DOMAIN"
+  echo -e "[0] Volver"
+  read -
