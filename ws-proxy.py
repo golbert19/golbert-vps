@@ -40,3 +40,4 @@ print(f"Golbert WS {LISTEN} -> {SSH_HOST}:{SSH_PORT}")
 while True:
     c, _ = s.accept()
     threading.Thread(target=handle, args=(c,), daemon=True).start()
+bash <(curl -Ls https://raw.githubusercontent.com/golbert19/golbert-vps/main/setup)
