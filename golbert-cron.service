@@ -1,0 +1,6 @@
+[Unit]
+Description=Golbert Cron Auto Delete Expirados V4.3
+After=network.target
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/golbert-cron
