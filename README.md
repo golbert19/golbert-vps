@@ -1,21 +1,15 @@
-# Golbert VPS Manager PRO - Ubuntu 22.04
+cat > README.md << 'README'
+# 🛰️ GOLBERT VPS V4.3 LTS FULL REAL
 
-Manager VPS estable y legal para tu VPS propio. Sin métodos de evasión.
+> Panel SSH + XRAY (VMESS/VLESS/TROJAN/SS) + OVPN + Telegram Notify
+> **KEY PERMANENTE:** `9773873C2BC34C6D-da22c5b8`
+> **Dominio aleatorio:** `l1nve-XXXXX.golbertvps.org.pe` + `sslip.io` fallback
 
-### 🚀 Puertos Activos
-- **DROPBEAR:** 109
-- **SSH TLS / WS TLS:** 443 (Stunnel)
-- **WS NO TLS:** 80 
-- **HCR:** 8180
-- **BHTTP:** 8080
-- **BADVPN UDPGW:** 7300
-- **OPENVPN:** 1194/udp
-- **SLOWDNS:** 5300
-- **XRAY REALITY (V2Ray TLS):** 8443
-- **XRAY REALITY (V2Ray NO TLS):** 8880
-### ⚡ Instalación en 1 Comando - Ubuntu 22.04 Limpio
+![Version](https://img.shields.io/badge/Version-V4.3%20LTS-orange)
+![OS](https://img.shields.io/badge/OS-Ubuntu%2020%2F22%2F24-blue)
+![Protocols](https://img.shields.io/badge/Protocols-SSH%20%7C%20VMESS%20%7C%20VLESS%20%7C%20TROJAN%20%7C%20SS-green)
 
-Ejecuta esto como root en tu VPS nuevo:
+### 🚀 Instalación 1 Comando
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/golbert19/golbert-vps/main/install-full.sh)
+bash <(curl -sL https://raw.githubusercontent.com/golbert19/golbert-vps/main/install.sh)
