@@ -17,6 +17,9 @@ Este no es el instalador genérico. Golbert MEIN instala una infraestructura de 
 - Acceso root
 - 1GB RAM / 10GB Disco mínimo
 - IP limpia
+## ESCRIBE LO SIGUIENTE PARA ENTRAR AL MENÚ ✏️ 
+
+golbert
 
 ## 📥 Instalación - Todo en un Bloque
 
@@ -24,11 +27,3 @@ Este no es el instalador genérico. Golbert MEIN instala una infraestructura de 
 # OPCION 1 - OFICIAL RECOMENDADA
 wget -4 -O setup https://raw.githubusercontent.com/golbert19/golbert-vps-mein/mein/setup && chmod +x setup && sudo ./setup
 
-# OPCION 2 - UNA LINEA CURL
-bash <(curl -sL https://raw.githubusercontent.com/golbert19/golbert-vps-mein/mein/setup)
-
-# OPCION 3 - GIT CLONE
-git clone https://github.com/golbert19/golbert-vps-mein.git && cd golbert-vps-mein && chmod +x setup && sudo ./setup
-
-# ABRIR MENU DESPUES DE INSTALAR
-golbert
