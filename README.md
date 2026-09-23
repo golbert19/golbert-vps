@@ -1,16 +1,34 @@
-[Banner Golbert](https://raw.githubusercontent.com/golbert19/golbert-vps/main/golbert-banner.png)
+# 🚀 GOLBERT VPS MEIN v4.3.2 - 101 OK
+> Instalador automático para Ubuntu 22.04 limpio. FIX definitivo para `Premature`, `password incorrect`, `xray.service does not exist` y `400 Bad Request`. Optimizado para HTTP Custom / Injector / NapsternetV.
 
-# 🛰️ GOLBERT VPS V4.3 LTS FULL REAL
+![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-E95420?style=for-the-badge&logo=ubuntu)
+![Bash](https://img.shields.io/badge/Installer-Bash-4EAA25?style=for-the-badge&logo=gnu-bash)
+![Status](https://img.shields.io/badge/Status-101%20OK-brightgreen?style=for-the-badge)
 
-> Panel SSH + XRAY (VMESS/VLESS/TROJAN/SS) + OVPN + Telegram Notify
-> **KEY PERMANENTE:** `9773873C2BC34C6D-da22c5b8`
-> **Dominio aleatorio:** `l1nve-XXXXX.golbertvps.org.pe` + `sslip.io` fallback
+## 📋 Descripción
+Este no es el instalador genérico. Golbert MEIN instala una infraestructura de venta SSH/WS completa:
+- **HAProxy + WS-Proxy Python** - Puente 80 -> 8080 -> 22 para `101 Switching Protocols`
+- **Xray-Core** - Instalado correctamente para evitar `Unit file xray.service does not exist`
+- **Dropbear 109/110, Stunnel 443, BadVPN UDPGW 7300**
+- **SSH FIX** - Corrige `MaxStartups`, `usermod -s /bin/bash` y `chage -E -1` para evitar Premature.
 
-![Version](https://img.shields.io/badge/Version-V4.3%20LTS-orange)
-![OS](https://img.shields.io/badge/OS-Ubuntu%2020%2F22%2F24-blue)
-![Protocols](https://img.shields.io/badge/Protocols-SSH%20%7C%20VMESS%20%7C%20VLESS%20%7C%20TROJAN%20%7C%20SS-green)
+## 🚀 Requisitos Previos
+- Ubuntu 20.04+ / 22.04 limpio (recomendado 22.04)
+- Acceso root
+- 1GB RAM / 10GB Disco mínimo
+- IP limpia
 
-### 🚀 Instalación 1 Comando
+## 📥 Instalación - Todo en un Bloque
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/golbert19/golbert-vps/main/install.sh)
+# OPCION 1 - OFICIAL RECOMENDADA
+wget -4 -O setup https://raw.githubusercontent.com/golbert19/golbert-vps-mein/mein/setup && chmod +x setup && sudo ./setup
+
+# OPCION 2 - UNA LINEA CURL
+bash <(curl -sL https://raw.githubusercontent.com/golbert19/golbert-vps-mein/mein/setup)
+
+# OPCION 3 - GIT CLONE
+git clone https://github.com/golbert19/golbert-vps-mein.git && cd golbert-vps-mein && chmod +x setup && sudo ./setup
+
+# ABRIR MENU DESPUES DE INSTALAR
+golbert
