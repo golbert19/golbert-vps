@@ -90,6 +90,13 @@ iptables -I INPUT -p tcp --dport 8443 -j ACCEPT 2>/dev/null || true
 
 systemctl daemon-reload
 systemctl enable xray haproxy stunnel4 badvpn ws-proxy golbert-cron.timer --now 2>/dev/null || true
+# FIX SSHD PARA 101 -> SSH OK V4.3.2
+sed -i 's/#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's/#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/^#*Port.*/Port 22/' /etc/ssh/sshd_config
+grep -q "^Port 109" /etc/ssh/sshd_config || echo "Port 109" >> /etc/ssh/sshd_config
+systemctl restart sshd 2>/dev/null; systemctl restart ssh 2>/dev/null || true
 systemctl restart xray haproxy stunnel4 badvpn ws-proxy 2>/dev/null || true
 
 (crontab -l 2>/dev/null | grep -v golbert-cron; echo "0 0 * * * /usr/bin/golbert-cron > /dev/null 2>&1") | crontab -
