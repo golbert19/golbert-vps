@@ -1,4 +1,15 @@
 #!/bin/bash
+# --- VALIDACION DE LICENCIA ---
+LIC=$(cat /etc/golbert/license.key 2>/dev/null)
+if [ -z "$LIC" ]; then echo "Sin licencia"; exit 1; fi
+AUTORIZADO=$(curl -s https://raw.githubusercontent.com/golbert19/golbert-vps/main/keys.txt | grep -c "$LIC")
+if [ "$AUTORIZADO" = "0" ]; then
+  echo "========================================="
+  echo " KEY NO AUTORIZADA: $LIC"
+  echo " Contacta a Golbert en Telegram"
+  echo "========================================="
+  exit 1
+fi
 # MENU GOLBERT PRO v2 - Ubuntu 22.04
 # Funciones: Crear user con expiracion, QR V2Ray, Monitor
 
