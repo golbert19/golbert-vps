@@ -5,7 +5,13 @@
 if [ "$(id -u)"!= "0" ]; then echo "Ejecuta como root"; exit 1; fi
 export DEBIAN_FRONTEND=noninteractive
 IP=$(curl -s ipv4.icanhazip.com)
-
+# --- GENERAR KEY UNICA POR INSTALACION ---
+KEY=$(cat /proc/sys/kernel/random/uuid | tr -d '-' | cut -c1-16 | tr 'a-z' 'A-Z')
+MACHINE=$(cat /etc/machine-id | cut -c1-8)
+LICENSE="$KEY-$MACHINE"
+mkdir -p /etc/golbert
+echo "$LICENSE" > /etc/golbert/license.key
+echo "$IP | $LICENSE | $(date)" >> /root/licencias.log
 apt update -y
 apt install -y dropbear stunnel4 curl wget python3 python3-pip screen qrencode unzip openvpn easy-rsa nginx certbot ufw
 
