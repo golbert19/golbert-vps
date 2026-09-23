@@ -75,7 +75,7 @@ v2ray_qr(){
 }
 
 reiniciar(){
-  systemctl restart dropbear stunnel4 ws-proxy badvpn xray
+  systemctl restart dropbear stunnel4 ws-proxy 2>/dev/null; systemctl restart xray 2>/dev/null; pkill badvpn; screen -dmS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300 --max-clients 1000
   echo -e "${GREEN}Servicios reiniciados${NC}"
   sleep 2
 }
