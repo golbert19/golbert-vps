@@ -1,16 +1,14 @@
-cat > ws-proxy.service << 'WS'
 [Unit]
-Description=Golbert WS Python Proxy V4.3
+Description=Golbert WS Python Proxy V4.3.2
 After=network.target haproxy.service
-Requires=haproxy.service
+Wants=network.target
 
 [Service]
 Type=simple
 User=root
 ExecStart=/usr/bin/python3 /usr/local/bin/ws-proxy.py
 Restart=always
-RestartSec=3
+RestartSec=2
 
 [Install]
 WantedBy=multi-user.target
-WS
