@@ -1,4 +1,4 @@
-![GOLBERT V4.3 LTS](https://raw.githubusercontent.com/golbert19/golbert-vps/main/golbert-banner.png)
+[GOLBERT V4.3 LTS](https://raw.githubusercontent.com/golbert19/golbert-vps/main/golbert-banner.png)
 # 🛰️ GOLBERT VPS V4.3 LTS FULL REAL
 
 > Panel SSH + XRAY (VMESS/VLESS/TROJAN/SS) + OVPN + Telegram Notify
@@ -12,4 +12,5 @@
 ### 🚀 Instalación 1 Comando
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/golbert19/golbert-vps/main/install.sh)
+apt update -y && apt install -y curl wget jq haproxy stunnel4 python3 screen -y
+bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install.sh)"
