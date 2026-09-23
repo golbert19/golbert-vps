@@ -24,6 +24,5 @@ golbert
 ## 📥 Instalación - Todo en un Bloque
 
 ```bash
-# OPCION 1 - OFICIAL RECOMENDADA
 wget -4 -O setup https://raw.githubusercontent.com/golbert19/golbert-vps-mein/mein/setup && chmod +x setup && sudo ./setup
 
