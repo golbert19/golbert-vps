@@ -1,43 +1,61 @@
-#!/usr/bin/env python3
-import socket, threading, select
-LISTEN = 8080
-SSH_HOST = '127.0.0.1'
-SSH_PORT = 22
+#!/bin/bash
+# GOLBERT VPS MEIN v4.3.2 - FIX RAW 101
+apt-get update -y && apt-get install -y python3 python3-pip git curl wget screen
+mkdir -p /etc/golbert && cd /etc/golbert
 
-def handle(client):
+cat > ws-proxy.py <<'PYEOF'
+import socket, threading, select, re
+PORT=80
+def handle(c):
     try:
-        data = client.recv(8192).decode(errors='ignore')
-        if 'Upgrade: websocket' in data or 'upgrade: websocket' in data.lower():
-            client.send(b'HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n\r\n')
+        req=c.recv(4096).decode(errors='ignore')
+        if not req: c.close(); return
+        host=''; port=22
+        m=re.search(r'X-Real-Host:\s*([^\r\n:]+):?(\d+)?', req, re.I)
+        if m:
+            host=m.group(1).strip();
+            if m.group(2): port=int(m.group(2))
         else:
-            client.send(b'HTTP/1.1 200 Golbert WS OK\r\nContent-Length: 0\r\n\r\n')
-        ssh = socket.socket()
-        ssh.settimeout(10)
-        ssh.connect((SSH_HOST, SSH_PORT))
+            m2=re.search(r'CONNECT\s+([^\s:]+):?(\d+)?', req, re.I)
+            if m2:
+                host=m2.group(1).strip()
+                if m2.group(2): port=int(m2.group(2))
+        if not host: host='127.0.0.1'
+        # FIX 101: respuesta RAW 101 sin headers extra
+        c.sendall(b'HTTP/1.1 101 Switching Protocols\r\n\r\n')
+        r=socket.create_connection((host, port), timeout=5)
         while True:
-            r, _, _ = select.select([client, ssh], [], [], 60)
-            if client in r:
-                d = client.recv(8192)
-                if not d: break
-                ssh.sendall(d)
-            if ssh in r:
-                d = ssh.recv(8192)
-                if not d: break
-                client.sendall(d)
-    except Exception as e:
-        pass
-    finally:
-        try: client.close()
-        except: pass
-        try: ssh.close()
+            rr,_,_=select.select([c,r],[],[],60)
+            if not rr: break
+            for sock in rr:
+                other=r if sock is c else c
+                data=sock.recv(8192)
+                if not data: c.close(); r.close(); return
+                other.sendall(data)
+    except:
+        try: c.close()
         except: pass
 
-s = socket.socket()
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind(('0.0.0.0', LISTEN))
-s.listen(128)
-print(f"Golbert WS {LISTEN} -> {SSH_HOST}:{SSH_PORT}")
+s=socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind(('0.0.0.0', PORT)); s.listen(100)
+print(f"GOLBERT RAW 101 ON {PORT}")
 while True:
-    c, _ = s.accept()
-    threading.Thread(target=handle, args=(c,), daemon=True).start()
-bash <(curl -Ls https://raw.githubusercontent.com/golbert19/golbert-vps/main/setup)
+    conn,_=s.accept()
+    threading.Thread(target=handle, args=(conn,), daemon=True).start()
+PYEOF
+
+cat > /etc/systemd/system/golbert.service <<'SVCEOF'
+[Unit]
+Description=Golbert WS Proxy
+After=network.target
+[Service]
+ExecStart=/usr/bin/python3 /etc/golbert/ws-proxy.py
+Restart=always
+[Install]
+WantedBy=multi-user.target
+SVCEOF
+
+systemctl daemon-reload
+systemctl enable golbert
+systemctl restart golbert
+echo "--- GOLBERT INSTALADO FIX 101 ---"
